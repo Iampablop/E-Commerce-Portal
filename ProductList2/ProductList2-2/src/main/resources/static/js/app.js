@@ -59,6 +59,7 @@ function increaseQuantity(e) {
             if(cartItems[i].id === itemId){
                 cartItems[i].quantity = cartItems[i].quantity + 1; //Se incrementa la cantidad
                 cartItems[i].amount = cartItems[i].price * cartItems[i].quantity;
+				cartItems[i].amountAfterDiscount = cartItems[i].priceAfterDiscount * cartItems[i].quantity;
             }
         }
 
@@ -82,6 +83,7 @@ function increaseQuantity(e) {
                 if(cartItems[i].quantity>1){
                     cartItems[i].quantity = cartItems[i].quantity - 1; //Se incrementa la cantidad
                     cartItems[i].amount = cartItems[i].price * cartItems[i].quantity;
+					cartItems[i].amountAfterDiscount = cartItems[i].priceAfterDiscount * cartItems[i].quantity;
                 }
                 
                 
@@ -135,6 +137,7 @@ function readItemInfo(item) {
         id: item.querySelector("a").getAttribute("data-id"),
         category: item.querySelector("span").textContent,
         amount: parseFloat(item.querySelector("p").textContent),
+		amountAfterDiscount: parseFloat(item.querySelector("p").textContent),
         quantity: 1
 
     }
@@ -174,7 +177,7 @@ function cartHTML() {
     cleanHTML();
     //Recorre el carrito y genera el HTML
     cartItems.forEach(item => {
-        const { image, title, price, priceAfterDiscount, quantity, id, category, amount } = item;
+        const { image, title, price, priceAfterDiscount, quantity, id, category, amount,amountAfterDiscount } = item;
         const row = document.createElement("tr");
         row.innerHTML = `
         <td>
@@ -189,8 +192,9 @@ function cartHTML() {
             <a class="btn decQuantity" onclick="decreaseQuantity()" data-id="${id}">-</a>
 
         </td>
-        <td>${category}</td>
+		<td>${category}</td>
         <td class="price amount">${amount}</td>
+		<td class="price amount">${amountAfterDiscount}</td>
         <td>
             <a href="#" class="delete-item" data-id="${id}"> X </a>
         </td>
@@ -227,16 +231,22 @@ function cleanHTML() {
 
 function updateShoppingCartTotal() {
     let total = 0;
+	let totalCartAfterDiscount = 0;
     const shoppingCartTotal = document.querySelector("#total-amount");
+	const shoppingCartTotalAfterDiscount = document.querySelector("#total-amount-after-discount");
     //console.log("shoppingCartTotal "+shoppingCartTotal)
 
     cartItems.forEach(function (item) {
         total += item.amount;
+		totalCartAfterDiscount += item.amountAfterDiscount;
+		
         shoppingCartTotal.textContent = total;
+		shoppingCartTotalAfterDiscount.textContent = totalCartAfterDiscount
         console.log("Total: " + total)
 
         if(cartItems.length === 0){
             shoppingCartTotal.textContent = 0;
+			shoppingCartTotalAfterDiscount.textContent = 0;
         }
     });
 
@@ -264,6 +274,7 @@ getPrice = function() {
         for(i=0; i<cartItems.length; i++){ //Recorremos el arreglo del carrito
             if(cartItems[i].category === category){ //Si la categoria del item es "soccer"
                 cartItems[i].priceAfterDiscount = cartItems[i].price - (cartItems[i].price * (discount / 100)) ; //El precio del item actual es igual al precio actual menos el descuento
+				cartItems[i].amountAfterDiscount = cartItems[i].priceAfterDiscount * cartItems[i].quantity;
                 cartItems[i].amount = cartItems[i].price * cartItems[i].quantity; //El amount del item es igual al precio actual por la cantidad actual
                 //cartItems[i].price.classList.add
                 cartHTML();
@@ -306,3 +317,31 @@ getPrice = function() {
 
 function getHref() {
 	 window.location.href = "payment" }
+
+function getHref(){
+
+    alert("Proceeding to checkout")
+
+    window.location.href = "payment.html";
+
+}
+
+
+
+function paid(){
+
+    alert("Order paid! Thanks for purchasing with us!")
+
+    localStorage.clear();
+
+    getIndex();
+
+}
+
+
+
+function getIndex(){
+
+    window.location.href = "index.html";
+
+}
